@@ -85,8 +85,8 @@ void ChassisGimbalShooterManual::run()
 void ChassisGimbalShooterManual::ecatReconnected()
 {
   ChassisGimbalManual::ecatReconnected();
-  // shooter_calibration_->reset();
-  // gimbal_calibration_->reset();
+  shooter_calibration_->reset();
+  gimbal_calibration_->reset();
   up_change_position_ = false;
   low_change_position_ = false;
   need_change_position_ = false;
@@ -457,7 +457,7 @@ void ChassisGimbalShooterManual::cPress()
   else
   {
     setChassisMode(rm_msgs::ChassisCmd::RAW);
-    chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::BURST);
+    chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::NORMAL);
   }
 }
 
@@ -616,10 +616,7 @@ void ChassisGimbalShooterManual::zPress()
 {
   if (chassis_cmd_sender_->getMsg()->mode != rm_msgs::ChassisCmd::RAW && !is_gyro_)
   {
-    chassis_cmd_sender_->setMode(rm_msgs::ChassisCmd::RAW);
-    is_gyro_ = true;
-    vel_cmd_sender_->setAngularZVel(0.0);
-    deployed_ = true;
+    setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
   }
   else
     setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
