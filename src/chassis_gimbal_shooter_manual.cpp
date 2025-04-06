@@ -411,7 +411,7 @@ void ChassisGimbalShooterManual::mouseLeftPress()
 
 void ChassisGimbalShooterManual::mouseRightPress()
 {
-  if (deployed_)
+  if (chassis_cmd_sender_->getMsg()->mode == rm_msgs::ChassisCmd::DEPLOY)
     gimbal_cmd_sender_->setUseLio(true);
   else
   {
