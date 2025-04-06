@@ -57,6 +57,7 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
   r_event_.setRising(boost::bind(&ChassisGimbalShooterManual::rPress, this));
   g_event_.setRising(boost::bind(&ChassisGimbalShooterManual::gPress, this));
   v_event_.setRising(boost::bind(&ChassisGimbalShooterManual::vPress, this));
+  z_event_.setRising(boost::bind(&ChassisGimbalShooterManual::zPress, this));
   ctrl_f_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlFPress, this));
   ctrl_v_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlVPress, this));
   ctrl_b_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlBPress, this));
@@ -84,8 +85,8 @@ void ChassisGimbalShooterManual::run()
 void ChassisGimbalShooterManual::ecatReconnected()
 {
   ChassisGimbalManual::ecatReconnected();
-  shooter_calibration_->reset();
-  gimbal_calibration_->reset();
+  // shooter_calibration_->reset();
+  // gimbal_calibration_->reset();
   up_change_position_ = false;
   low_change_position_ = false;
   need_change_position_ = false;
@@ -114,6 +115,7 @@ void ChassisGimbalShooterManual::checkKeyboard(const rm_msgs::DbusData::ConstPtr
   x_event_.update(dbus_data->key_x & !dbus_data->key_ctrl);
   r_event_.update((!dbus_data->key_ctrl) & dbus_data->key_r);
   v_event_.update((!dbus_data->key_ctrl) & dbus_data->key_v);
+  z_event_.update((!dbus_data->key_ctrl) & dbus_data->key_z);
   ctrl_f_event_.update(dbus_data->key_f & dbus_data->key_ctrl);
   ctrl_v_event_.update(dbus_data->key_ctrl & dbus_data->key_v);
   ctrl_b_event_.update(dbus_data->key_ctrl & dbus_data->key_b & !dbus_data->key_shift);
@@ -409,20 +411,26 @@ void ChassisGimbalShooterManual::mouseLeftPress()
 
 void ChassisGimbalShooterManual::mouseRightPress()
 {
-  if (track_data_.id == 0)
-    gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
+  if (deployed_)
+    gimbal_cmd_sender_->setUseLio(true);
   else
   {
-    gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRACK);
-    gimbal_cmd_sender_->setBulletSpeed(shooter_cmd_sender_->getSpeed());
-  }
-  if (switch_armor_target_srv_->getArmorTarget() == rm_msgs::StatusChangeRequest::ARMOR_OUTPOST_BASE)
-  {
-    if (shooter_cmd_sender_->getMsg()->mode != rm_msgs::ShootCmd::STOP)
+    if (track_data_.id == 0)
+      gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
+    else
     {
-      shooter_cmd_sender_->setMode(rm_msgs::ShootCmd::PUSH);
-      shooter_cmd_sender_->checkError(ros::Time::now());
+      gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRACK);
+      gimbal_cmd_sender_->setBulletSpeed(shooter_cmd_sender_->getSpeed());
     }
+    if (switch_armor_target_srv_->getArmorTarget() == rm_msgs::StatusChangeRequest::ARMOR_OUTPOST_BASE)
+    {
+      if (shooter_cmd_sender_->getMsg()->mode != rm_msgs::ShootCmd::STOP)
+      {
+        shooter_cmd_sender_->setMode(rm_msgs::ShootCmd::PUSH);
+        shooter_cmd_sender_->checkError(ros::Time::now());
+      }
+    }
+    gimbal_cmd_sender_->setUseLio(false);
   }
 }
 
@@ -449,7 +457,7 @@ void ChassisGimbalShooterManual::cPress()
   else
   {
     setChassisMode(rm_msgs::ChassisCmd::RAW);
-    chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::NORMAL);
+    chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::BURST);
   }
 }
 
@@ -602,6 +610,19 @@ void ChassisGimbalShooterManual::xRelease()
 void ChassisGimbalShooterManual::vPress()
 {
   shooter_cmd_sender_->raiseSpeed();
+}
+
+void ChassisGimbalShooterManual::zPress()
+{
+  if (chassis_cmd_sender_->getMsg()->mode != rm_msgs::ChassisCmd::RAW && !is_gyro_)
+  {
+    chassis_cmd_sender_->setMode(rm_msgs::ChassisCmd::RAW);
+    is_gyro_ = true;
+    vel_cmd_sender_->setAngularZVel(0.0);
+    deployed_ = true;
+  }
+  else
+    setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
 }
 
 void ChassisGimbalShooterManual::shiftPress()
