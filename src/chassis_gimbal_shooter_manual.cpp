@@ -411,8 +411,12 @@ void ChassisGimbalShooterManual::mouseLeftPress()
 
 void ChassisGimbalShooterManual::mouseRightPress()
 {
-  if (chassis_cmd_sender_->getMsg()->mode == rm_msgs::ChassisCmd::DEPLOY)
+  if (deployed_)
+  {
     gimbal_cmd_sender_->setUseLio(true);
+    gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRACK);
+    gimbal_cmd_sender_->setBulletSpeed(shooter_cmd_sender_->getSpeed());
+  }
   else
   {
     if (track_data_.id == 0)
@@ -617,9 +621,13 @@ void ChassisGimbalShooterManual::zPress()
   if (chassis_cmd_sender_->getMsg()->mode != rm_msgs::ChassisCmd::RAW && !is_gyro_)
   {
     setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
+    deployed_ = true;
   }
   else
+  {
     setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
+    deployed_ = false;
+  }
 }
 
 void ChassisGimbalShooterManual::shiftPress()
