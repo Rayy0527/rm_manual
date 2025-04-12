@@ -27,6 +27,11 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
     image_transmission_cmd_sender_ = new rm_common::JointPositionBinaryCommandSender(image_transmission_nh);
     scale_ = getParam(image_transmission_nh, "position_scale", 1);
   }
+  if (nh.hasParam("use_lio"))
+  {
+    ros::NodeHandle lio_nh(nh, "use_lio");
+    use_lio_cmd_sender_ = new rm_common::UseLioCommandSender(lio_nh);
+  }
 
   ros::NodeHandle detection_switch_nh(nh, "detection_switch");
   switch_detection_srv_ = new rm_common::SwitchDetectionCaller(detection_switch_nh);
@@ -413,7 +418,7 @@ void ChassisGimbalShooterManual::mouseRightPress()
 {
   if (deployed_)
   {
-    gimbal_cmd_sender_->setUseLio(true);
+    use_lio_cmd_sender_->setUseLio(true);
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRACK);
     gimbal_cmd_sender_->setBulletSpeed(shooter_cmd_sender_->getSpeed());
   }
@@ -434,7 +439,7 @@ void ChassisGimbalShooterManual::mouseRightPress()
         shooter_cmd_sender_->checkError(ros::Time::now());
       }
     }
-    gimbal_cmd_sender_->setUseLio(false);
+    use_lio_cmd_sender_->setUseLio(false);
   }
 }
 
