@@ -29,8 +29,8 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
   }
   if (nh.hasParam("use_lio"))
   {
-    ros::NodeHandle lio_nh(nh, "use_lio");
-    use_lio_cmd_sender_ = new rm_common::UseLioCommandSender(lio_nh);
+    ros::NodeHandle use_lio_nh(nh, "use_lio");
+    use_lio_cmd_sender_ = new rm_common::UseLioCommandSender(use_lio_nh);
   }
 
   ros::NodeHandle detection_switch_nh(nh, "detection_switch");
@@ -198,6 +198,8 @@ void ChassisGimbalShooterManual::sendCommand(const ros::Time& time)
   shooter_cmd_sender_->sendCommand(time);
   if (camera_switch_cmd_sender_)
     camera_switch_cmd_sender_->sendCommand(time);
+  if (use_lio_cmd_sender_)
+    use_lio_cmd_sender_->sendCommand(time);
   if (scope_cmd_sender_)
   {
     if (!use_scope_)

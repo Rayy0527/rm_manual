@@ -68,6 +68,8 @@ protected:
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
     if (shooter_cmd_sender_->getMsg()->mode == rm_msgs::ShootCmd::PUSH)
       shooter_cmd_sender_->setMode(rm_msgs::ShootCmd::READY);
+    if (use_lio_cmd_sender_->getUseLio())
+      use_lio_cmd_sender_->setUseLio(false);
   }
   void wPress() override;
   void aPress() override;
