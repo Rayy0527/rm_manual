@@ -30,9 +30,10 @@ protected:
   void rightSwitchMidRise() override;
   void rightSwitchUpRise() override;
   void ePress() override;
+  void eRelease() override;
+  void bPress() override;
   void cPress() override;
-  void zPress();
-  void zRelease();
+  void qPress() override;
   void ctrlRPressing();
   void ctrlRRelease() override;
   void wPress() override;
@@ -44,6 +45,9 @@ protected:
   void aRelease() override;
   void sRelease() override;
   void dRelease() override;
+  void zPress() override
+  {
+  }
 
   virtual void ctrlZPress();
   virtual void ctrlZRelease()

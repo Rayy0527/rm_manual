@@ -32,8 +32,10 @@ ChassisGimbalShooterCoverManual::ChassisGimbalShooterCoverManual(ros::NodeHandle
   ctrl_z_event_.setEdge(boost::bind(&ChassisGimbalShooterCoverManual::ctrlZPress, this),
                         boost::bind(&ChassisGimbalShooterCoverManual::ctrlZRelease, this));
   ctrl_r_event_.setActiveHigh(boost::bind(&ChassisGimbalShooterCoverManual::ctrlRPressing, this));
-  z_event_.setEdge(boost::bind(&ChassisGimbalShooterCoverManual::zPress, this),
-                   boost::bind(&ChassisGimbalShooterCoverManual::zRelease, this));
+  e_event_.setEdge(boost::bind(&ChassisGimbalShooterCoverManual::ePress, this),
+                   boost::bind(&ChassisGimbalShooterCoverManual::eRelease, this));
+  q_event_.setRising(boost::bind(&ChassisGimbalShooterCoverManual::qPress, this));
+  z_event_.setRising(boost::bind(&ChassisGimbalShooterCoverManual::zPress, this));
 }
 
 void ChassisGimbalShooterCoverManual::changeSpeedMode(SpeedMode speed_mode)
@@ -119,7 +121,6 @@ void ChassisGimbalShooterCoverManual::checkKeyboard(const rm_msgs::DbusData::Con
 {
   ChassisGimbalShooterManual::checkKeyboard(dbus_data);
   ctrl_z_event_.update(dbus_data->key_ctrl & dbus_data->key_z);
-  z_event_.update((!dbus_data->key_ctrl) & dbus_data->key_z);
 }
 
 void ChassisGimbalShooterCoverManual::sendCommand(const ros::Time& time)
@@ -207,34 +208,35 @@ void ChassisGimbalShooterCoverManual::ePress()
     else
       changeGyroSpeedMode(NORMAL);
   }
-}
-
-void ChassisGimbalShooterCoverManual::cPress()
-{
-  if (is_gyro_)
-  {
-    setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
-  }
-  else
-  {
-    setChassisMode(rm_msgs::ChassisCmd::RAW);
-    chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::NORMAL);
-    if (switch_buff_srv_->getTarget() != rm_msgs::StatusChangeRequest::ARMOR)
-      changeGyroSpeedMode(LOW);
-    else
-      changeGyroSpeedMode(NORMAL);
-  }
-}
-
-void ChassisGimbalShooterCoverManual::zPress()
-{
   last_shoot_freq_ = shooter_cmd_sender_->getShootFrequency();
   shooter_cmd_sender_->setShootFrequency(rm_common::HeatLimit::MINIMAL);
 }
 
-void ChassisGimbalShooterCoverManual::zRelease()
+void ChassisGimbalShooterCoverManual::eRelease()
 {
+  ChassisGimbalShooterManual::eRelease();
   shooter_cmd_sender_->setShootFrequency(last_shoot_freq_);
+}
+
+void ChassisGimbalShooterCoverManual::bPress()
+{
+  chassis_cmd_sender_->power_limit_->setStartBurstTime(ros::Time::now());
+}
+
+void ChassisGimbalShooterCoverManual::cPress()
+{
+  setChassisMode(rm_msgs::ChassisCmd::RAW);
+  chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::BURST);
+  if (switch_buff_srv_->getTarget() != rm_msgs::StatusChangeRequest::ARMOR)
+    changeGyroSpeedMode(LOW);
+  else
+    changeGyroSpeedMode(NORMAL);
+}
+
+void ChassisGimbalShooterCoverManual::qPress()
+{
+  setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
+  chassis_cmd_sender_->power_limit_->updateState(rm_common::PowerLimit::NORMAL);
 }
 
 void ChassisGimbalShooterCoverManual::wPress()
