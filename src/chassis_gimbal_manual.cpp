@@ -21,6 +21,7 @@ ChassisGimbalManual::ChassisGimbalManual(ros::NodeHandle& nh, ros::NodeHandle& n
   ros::NodeHandle gimbal_nh(nh, "gimbal");
   gimbal_cmd_sender_ = new rm_common::GimbalCommandSender(gimbal_nh);
   gimbal_scale_ = getParam(gimbal_nh, "gimbal_scale", 1.0);
+  traj_scale_ = getParam(gimbal_nh, "traj_scale", 0.5);
   if (!gimbal_nh.getParam("finish_turning_threshold", finish_turning_threshold_))
     ROS_ERROR("Finish turning threshold no defined (namespace: %s)", nh.getNamespace().c_str());
 
@@ -55,7 +56,7 @@ void ChassisGimbalManual::updateRc(const rm_msgs::DbusData::ConstPtr& dbus_data)
 void ChassisGimbalManual::updatePc(const rm_msgs::DbusData::ConstPtr& dbus_data)
 {
   ManualBase::updatePc(dbus_data);
-  gimbal_cmd_sender_->setRate(-dbus_data->m_x * gimbal_scale_, dbus_data->m_y * gimbal_scale_);
+  gimbal_cmd_sender_->setRate(-dbus_data->m_x * gimbal_scale_, -dbus_data->m_y * gimbal_scale_);
   if (gimbal_cmd_sender_->getMsg()->mode == rm_msgs::GimbalCmd::RATE)
     chassis_cmd_sender_->setFollowVelDes(gimbal_cmd_sender_->getMsg()->rate_yaw);
   else
