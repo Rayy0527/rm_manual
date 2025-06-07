@@ -37,6 +37,7 @@
 #include <rm_msgs/ManualToReferee.h>
 #include <rm_msgs/ShootData.h>
 #include <rm_msgs/PowerManagementSampleAndStatusData.h>
+#include <std_msgs/Float32.h>
 #include "rm_manual/input_event.h"
 
 namespace rm_manual
@@ -93,6 +94,9 @@ protected:
   {
   }
   virtual void shootDataCallback(const rm_msgs::ShootData::ConstPtr& data)
+  {
+  }
+  virtual void disBase2TargetCallback(const std_msgs::Float32::ConstPtr& data)
   {
   }
 
@@ -154,11 +158,12 @@ protected:
 
   ros::Subscriber ecat_bus_state_sub_, odom_sub_, dbus_sub_, track_sub_, referee_sub_, capacity_sub_, game_status_sub_,
       joint_state_sub_, game_robot_hp_sub_, actuator_state_sub_, power_heat_data_sub_, gimbal_des_error_sub_,
-      game_robot_status_sub_, suggest_fire_sub_, shoot_beforehand_cmd_sub_, shoot_data_sub_;
+      game_robot_status_sub_, suggest_fire_sub_, shoot_beforehand_cmd_sub_, shoot_data_sub_, dis_base2target_sub_;
 
   sensor_msgs::JointState joint_state_;
   rm_msgs::TrackData track_data_;
   rm_msgs::ManualToReferee manual_to_referee_pub_data_;
+  std_msgs::Float32 dis_base2target_data_;
 
   rm_common::ControllerManager controller_manager_;
 

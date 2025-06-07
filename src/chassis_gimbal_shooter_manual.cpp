@@ -191,6 +191,12 @@ void ChassisGimbalShooterManual::shootDataCallback(const rm_msgs::ShootData::Con
     shooter_cmd_sender_->updateShootData(*data);
 }
 
+void ChassisGimbalShooterManual::disBase2TargetCallback(const std_msgs::Float32::ConstPtr& data)
+{
+  ManualBase::disBase2TargetCallback(data);
+  dis_base2target_data_ = *data;
+}
+
 void ChassisGimbalShooterManual::sendCommand(const ros::Time& time)
 {
   ChassisGimbalManual::sendCommand(time);
@@ -659,7 +665,8 @@ void ChassisGimbalShooterManual::zPress()
     traj_yaw_ = yaw, traj_pitch_ = -0.585;
     gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
     setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
-    shooter_cmd_sender_->setDeployState(true);
+    if (dis_base2target_data_.data <= 16.0)
+      shooter_cmd_sender_->setDeployState(true);
     deployed_ = true;
   }
   else

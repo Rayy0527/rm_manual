@@ -54,6 +54,7 @@ protected:
   void suggestFireCallback(const std_msgs::Bool::ConstPtr& data) override;
   void trackCallback(const rm_msgs::TrackData::ConstPtr& data) override;
   void shootDataCallback(const rm_msgs::ShootData::ConstPtr& data) override;
+  void disBase2TargetCallback(const std_msgs::Float32::ConstPtr& data) override;
   void leftSwitchUpOn(ros::Duration duration);
   void leftSwitchUpFall();
   void mouseLeftPress();
