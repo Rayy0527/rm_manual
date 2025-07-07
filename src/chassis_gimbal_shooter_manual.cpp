@@ -61,6 +61,7 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
   g_event_.setRising(boost::bind(&ChassisGimbalShooterManual::gPress, this));
   v_event_.setRising(boost::bind(&ChassisGimbalShooterManual::vPress, this));
   z_event_.setRising(boost::bind(&ChassisGimbalShooterManual::zPress, this));
+  q_event_.setRising(boost::bind(&ChassisGimbalShooterManual::qPress, this));
   ctrl_f_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlFPress, this));
   ctrl_v_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlVPress, this));
   ctrl_b_event_.setRising(boost::bind(&ChassisGimbalShooterManual::ctrlBPress, this));
@@ -120,6 +121,7 @@ void ChassisGimbalShooterManual::checkKeyboard(const rm_msgs::DbusData::ConstPtr
   r_event_.update((!dbus_data->key_ctrl) & dbus_data->key_r);
   v_event_.update((!dbus_data->key_ctrl) & dbus_data->key_v);
   z_event_.update((!dbus_data->key_ctrl) & dbus_data->key_z);
+  q_event_.update((!dbus_data->key_ctrl) & dbus_data->key_q);
   ctrl_f_event_.update(dbus_data->key_f & dbus_data->key_ctrl);
   ctrl_v_event_.update(dbus_data->key_ctrl & dbus_data->key_v);
   ctrl_b_event_.update(dbus_data->key_ctrl & dbus_data->key_b & !dbus_data->key_shift);
@@ -647,6 +649,14 @@ void ChassisGimbalShooterManual::vPress()
   shooter_cmd_sender_->raiseSpeed();
 }
 
+void ChassisGimbalShooterManual::qPress()
+{
+  if (!shooter_cmd_sender_->getDeployState())
+    shooter_cmd_sender_->setDeployState(true);
+  else
+    shooter_cmd_sender_->setDeployState(false);
+}
+
 void ChassisGimbalShooterManual::zPress()
 {
   if (chassis_cmd_sender_->getMsg()->mode != rm_msgs::ChassisCmd::RAW && !deployed_)
@@ -665,15 +675,12 @@ void ChassisGimbalShooterManual::zPress()
     traj_yaw_ = yaw, traj_pitch_ = -0.585;
     gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
     setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
-    if (dis_base2target_data_.data <= 16.0)
-      shooter_cmd_sender_->setDeployState(true);
     deployed_ = true;
   }
   else
   {
     setChassisMode(rm_msgs::ChassisCmd::FOLLOW);
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
-    shooter_cmd_sender_->setDeployState(false);
     deployed_ = false;
   }
 }
