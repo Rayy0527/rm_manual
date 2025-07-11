@@ -36,7 +36,6 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
   {
     ros::NodeHandle pitch_joint_nh(nh, "pitch_joint");
     pitch_joint_sender_ = new rm_common::JointPointCommandSender(pitch_joint_nh, joint_state_);
-
   }
 
   ros::NodeHandle detection_switch_nh(nh, "detection_switch");
