@@ -32,6 +32,12 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
     ros::NodeHandle use_lio_nh(nh, "use_lio");
     use_lio_cmd_sender_ = new rm_common::UseLioCommandSender(use_lio_nh);
   }
+  if (nh.hasParam("pitch_joint"))
+  {
+    ros::NodeHandle pitch_joint_nh(nh, "pitch_joint");
+    pitch_joint_sender_ = new rm_common::JointPointCommandSender(pitch_joint_nh, joint_state_);
+
+  }
 
   ros::NodeHandle detection_switch_nh(nh, "detection_switch");
   switch_detection_srv_ = new rm_common::SwitchDetectionCaller(detection_switch_nh);
@@ -339,6 +345,7 @@ void ChassisGimbalShooterManual::updatePc(const rm_msgs::DbusData::ConstPtr& dbu
     deployed_ = false;
     base_bottom_ = false;
     shooter_cmd_sender_->setDeployState(false);
+    pitch_current_ = joint_state_.position[pitch_joint_sender_->getIndex()];
   }
 }
 
@@ -509,7 +516,7 @@ void ChassisGimbalShooterManual::bPress()
     }
     gimbal_cmd_sender_->setGimbalTrajFrameId("base_link");
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRAJ);
-    traj_yaw_ = yaw, traj_pitch_ = pitch + 0.045;
+    traj_yaw_ = yaw, traj_pitch_ = joint_state_.position[pitch_joint_sender_->getIndex()] + 0.045;
     gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
     base_bottom_ = true;
   }
@@ -682,7 +689,7 @@ void ChassisGimbalShooterManual::zPress()
     }
     gimbal_cmd_sender_->setGimbalTrajFrameId("base_link");
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRAJ);
-    traj_yaw_ = yaw, traj_pitch_ = -0.585;
+    traj_yaw_ = yaw, traj_pitch_ = -0.520;
     gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
     setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
     shooter_cmd_sender_->setDeployState(true);
