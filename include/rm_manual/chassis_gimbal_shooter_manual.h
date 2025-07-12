@@ -122,6 +122,7 @@ protected:
   rm_common::JointPositionBinaryCommandSender* scope_cmd_sender_{};
   rm_common::JointPositionBinaryCommandSender* image_transmission_cmd_sender_{};
   rm_common::JointPointCommandSender* pitch_joint_sender_{};
+  rm_common::JointPointCommandSender* yaw_joint_sender_{};
   rm_common::UseLioCommandSender* use_lio_cmd_sender_{};
   rm_common::SwitchDetectionCaller* switch_detection_srv_{};
   rm_common::SwitchDetectionCaller* switch_armor_target_srv_{};
@@ -135,7 +136,7 @@ protected:
   bool prepare_shoot_ = false, is_balance_ = false, use_scope_ = false, adjust_image_transmission_ = false,
        up_change_position_ = false, low_change_position_ = false, need_change_position_ = false, deployed_ = false,
        base_bottom_ = false;
-  double pitch_current_{};
+  double pitch_current_{}, yaw_current_{};
   double traj_yaw_, traj_pitch_;
   double scale_;
 };
