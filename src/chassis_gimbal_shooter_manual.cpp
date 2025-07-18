@@ -508,15 +508,6 @@ void ChassisGimbalShooterManual::bPress()
 {
   if (deployed_ && !base_bottom_)
   {
-    double roll{}, pitch{}, yaw{};
-    try
-    {
-      quatToRPY(tf_buffer_.lookupTransform("base_link", "yaw", ros::Time(0)).transform.rotation, roll, pitch, yaw);
-    }
-    catch (tf2::TransformException& ex)
-    {
-      ROS_WARN("%s", ex.what());
-    }
     gimbal_cmd_sender_->setGimbalTrajFrameId("base_link");
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRAJ);
     traj_yaw_ = joint_state_.position[yaw_joint_sender_->getIndex()];
@@ -693,7 +684,7 @@ void ChassisGimbalShooterManual::zPress()
     }
     gimbal_cmd_sender_->setGimbalTrajFrameId("base_link");
     gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRAJ);
-    traj_yaw_ = yaw, traj_pitch_ = -0.520;
+    traj_yaw_ = yaw, traj_pitch_ = -0.560;
     gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
     setChassisMode(rm_msgs::ChassisCmd::DEPLOY);
     shooter_cmd_sender_->setDeployState(true);

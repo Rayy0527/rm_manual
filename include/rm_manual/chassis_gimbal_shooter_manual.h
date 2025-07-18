@@ -65,7 +65,16 @@ protected:
   void mouseRightPress();
   void mouseRightRelease()
   {
-    gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
+    if (deployed_)
+    {
+      gimbal_cmd_sender_->setGimbalTrajFrameId("base_link");
+      gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::TRAJ);
+      traj_yaw_ = joint_state_.position[yaw_joint_sender_->getIndex()];
+      traj_pitch_ = joint_state_.position[pitch_joint_sender_->getIndex()];
+      gimbal_cmd_sender_->setGimbalTraj(traj_yaw_, traj_pitch_);
+    }
+    else
+      gimbal_cmd_sender_->setMode(rm_msgs::GimbalCmd::RATE);
     if (shooter_cmd_sender_->getMsg()->mode == rm_msgs::ShootCmd::PUSH)
       shooter_cmd_sender_->setMode(rm_msgs::ShootCmd::READY);
     if (use_lio_cmd_sender_->getUseLio())
