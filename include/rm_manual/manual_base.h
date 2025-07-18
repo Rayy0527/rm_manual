@@ -7,6 +7,7 @@
 #include <queue>
 #include <iostream>
 #include <ros/ros.h>
+#include <unordered_map>
 #include <serial/serial.h>
 #include <std_msgs/Bool.h>
 #include <tf2_ros/buffer.h>
@@ -39,6 +40,8 @@
 #include <rm_msgs/PowerManagementSampleAndStatusData.h>
 #include <std_msgs/Float32.h>
 #include "rm_manual/input_event.h"
+
+#include <rm_ecat_msgs/RmEcatStandardSlaveReadings.h>
 
 namespace rm_manual
 {
