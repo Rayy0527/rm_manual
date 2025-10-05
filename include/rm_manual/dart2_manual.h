@@ -126,7 +126,7 @@ protected:
   rm_common::JointPointCommandSender* trigger_sender_;
   rm_common::JointPointCommandSender* rotate_sender_;
   rm_common::JointPointCommandSender *clamp_left_sender_, *clamp_right_sender_, *clamp_mid_sender_;
-  rm_common::JointPointCommandSender* belt_left_sender_, *belt_right_sender_;
+  rm_common::JointPointCommandSender *belt_left_sender_, *belt_right_sender_;
   rm_common::JointPointCommandSender* range_sender_;
   rm_common::CalibrationQueue *shooter_calibration_, *gimbal_calibration_, *clamp_calibration_;
 
@@ -134,7 +134,7 @@ protected:
   double downward_vel_, upward_vel_;
   std::unordered_map<int, Dart> dart_list_{};
   std::unordered_map<std::string, std::vector<double>> target_position_{};
-//  std::unordered_map<std::string, std::vector<double>> rotate_position_{};
+  //  std::unordered_map<std::string, std::vector<double>> rotate_position_{};
   std::unordered_map<rm_common::JointPointCommandSender*, double> clamp_position_{};
   std::vector<double> rotate_place_position_{}, rotate_back_position_{};
 
@@ -143,7 +143,7 @@ protected:
       ready_{ false };
   int has_fired_num_{};
   bool clamp_calibrate_{ false };
-  bool left_clamp_is_release_{ false },mid_clamp_is_release_{false},right_clamp_is_release_{false};
+  bool left_clamp_is_release_{ false }, mid_clamp_is_release_{ false }, right_clamp_is_release_{ false };
   bool confirm_place_{ false }, confirm_back_{ false };
   ros::Time last_time_{};
   uint8_t launch_mode_{ 0 }, last_launch_mode_{ 6 };
@@ -158,8 +158,8 @@ protected:
   double trigger_home_command_{}, trigger_work_command_{};
   double trigger_confirm_home_{}, trigger_confirm_work_{};
   double belt_left_position_{}, belt_right_position_{}, trigger_position_{};
-  double belt_left_max_{}, belt_right_max_{}, belt_left_min_{}, belt_right_min_{}, belt_left_place_{}, belt_right_place_{},
-      belt_left_placed_{}, belt_right_placed_{};
+  double belt_left_max_{}, belt_right_max_{}, belt_left_min_{}, belt_right_min_{}, belt_left_place_{},
+      belt_right_place_{}, belt_left_placed_{}, belt_right_placed_{};
   double clamp_left_position_, clamp_mid_position_, clamp_right_position_, release_position_, clamp_finish_position_;
   double range_velocity_ = 0., yaw_velocity_ = 0., rotate_velocity_ = 0.;
 
@@ -172,9 +172,9 @@ protected:
   bool camera_central_{}, is_adjust_{};
   bool camera_is_online_{};
   bool use_auto_aim_{}, start_aim_{};
-  bool allow_push_{false};
+  bool allow_push_{ false };
   bool had_adjust_{};
-  bool need_back_{},check_place_{};
+  bool need_back_{}, check_place_{};
   double long_camera_x_before_push_{}, long_camera_x_after_push_{};
 
   InputEvent wheel_clockwise_event_, wheel_anticlockwise_event_;

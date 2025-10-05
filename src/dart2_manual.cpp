@@ -37,7 +37,7 @@ Dart2Manual::Dart2Manual(ros::NodeHandle& nh, ros::NodeHandle& nh_referee) : Man
   nh_clamp.getParam("clamp_right_position", clamp_right_position_);
   nh_clamp.getParam("release_position", release_position_);
   nh_clamp.getParam("clamp_finish_position", clamp_finish_position_);
-  nh_clamp.getParam("check_place",check_place_);
+  nh_clamp.getParam("check_place", check_place_);
 
   ros::NodeHandle nh_belt_left = ros::NodeHandle(nh, "belt_left");
   ros::NodeHandle nh_belt_right = ros::NodeHandle(nh, "belt_right");
@@ -60,19 +60,19 @@ Dart2Manual::Dart2Manual(ros::NodeHandle& nh, ros::NodeHandle& nh_referee) : Man
   ros::NodeHandle nh_clamp_left = ros::NodeHandle(nh, "clamp_left");
   ros::NodeHandle nh_clamp_mid = ros::NodeHandle(nh, "clamp_mid");
   ros::NodeHandle nh_clamp_right = ros::NodeHandle(nh, "clamp_right");
-  clamp_left_sender_ = new rm_common::JointPointCommandSender(nh_clamp_left,joint_state_);
-  clamp_mid_sender_ = new rm_common::JointPointCommandSender(nh_clamp_mid,joint_state_);
-  clamp_right_sender_ = new rm_common::JointPointCommandSender(nh_clamp_right,joint_state_);
+  clamp_left_sender_ = new rm_common::JointPointCommandSender(nh_clamp_left, joint_state_);
+  clamp_mid_sender_ = new rm_common::JointPointCommandSender(nh_clamp_mid, joint_state_);
+  clamp_right_sender_ = new rm_common::JointPointCommandSender(nh_clamp_right, joint_state_);
   clamp_position_.insert(std::make_pair(clamp_left_sender_, clamp_left_position_));
   clamp_position_.insert(std::make_pair(clamp_mid_sender_, clamp_mid_position_));
   clamp_position_.insert(std::make_pair(clamp_right_sender_, clamp_right_position_));
 
-  XmlRpc::XmlRpcValue shooter_rpc_value, gimbal_rpc_value,clamp_rpc_value;
+  XmlRpc::XmlRpcValue shooter_rpc_value, gimbal_rpc_value, clamp_rpc_value;
   nh.getParam("shooter_calibration", shooter_rpc_value);
   shooter_calibration_ = new rm_common::CalibrationQueue(shooter_rpc_value, nh, controller_manager_);
   nh.getParam("gimbal_calibration", gimbal_rpc_value);
   gimbal_calibration_ = new rm_common::CalibrationQueue(gimbal_rpc_value, nh, controller_manager_);
-  nh.getParam("clamp_calibration",clamp_rpc_value);
+  nh.getParam("clamp_calibration", clamp_rpc_value);
   clamp_calibration_ = new rm_common::CalibrationQueue(clamp_rpc_value, nh, controller_manager_);
 
   ros::NodeHandle nh_camera = ros::NodeHandle(nh, "camera");
@@ -83,7 +83,7 @@ Dart2Manual::Dart2Manual(ros::NodeHandle& nh, ros::NodeHandle& nh_referee) : Man
   nh_camera.getParam("short_camera_p_x", short_camera_p_x_);
   nh_camera.getParam("long_camera_x_threshold", long_camera_x_threshold_);
   nh_camera.getParam("retarget_threshold", retarget_threshold_);
-  nh_camera.getParam("use_auto_aim",use_auto_aim_);
+  nh_camera.getParam("use_auto_aim", use_auto_aim_);
 
   left_switch_up_event_.setActiveHigh(boost::bind(&Dart2Manual::leftSwitchUpOn, this));
   left_switch_mid_event_.setActiveHigh(boost::bind(&Dart2Manual::leftSwitchMidOn, this));
@@ -151,8 +151,8 @@ void Dart2Manual::getList(const XmlRpc::XmlRpcValue& darts, const XmlRpc::XmlRpc
   }
   for (int i = 0; i < static_cast<int>(rotate_place_position_.size()); ++i)
   {
-    std::cout <<"place i:"<<i<< "  num:"<< rotate_place_position_[i] << std::endl;
-    std::cout << "back i:"<<i << "  num:"<< rotate_back_position_[i] << std::endl;
+    std::cout << "place i:" << i << "  num:" << rotate_place_position_[i] << std::endl;
+    std::cout << "back i:" << i << "  num:" << rotate_back_position_[i] << std::endl;
   }
 }
 
@@ -162,7 +162,7 @@ void Dart2Manual::gameRobotStatusCallback(const rm_msgs::GameRobotStatus::ConstP
   robot_id_ = data->robot_id;
   if (!clamp_calibrate_)
   {
-    clamp_calibration_ -> reset();
+    clamp_calibration_->reset();
     clamp_calibrate_ = true;
   }
 }
@@ -231,7 +231,7 @@ void Dart2Manual::init()
   auto_aim_state_ = NONE;
   if (dart_fired_num_ > 3)
   {
-    rotate_sender_ -> setPoint(rotate_back_position_[3]);
+    rotate_sender_->setPoint(rotate_back_position_[3]);
     dart_fired_num_ = 0;
     need_back_ = true;
   }
@@ -240,7 +240,7 @@ void Dart2Manual::init()
 void Dart2Manual::pullDown()
 {
   ROS_INFO("Enter PULLDOWN");
-  rotate_sender_ -> setPoint(rotate_back_position_[dart_fired_num_]);
+  rotate_sender_->setPoint(rotate_back_position_[dart_fired_num_]);
   trigger_sender_->setPoint(trigger_work_command_);
   belt_left_sender_->setPoint(downward_vel_);
   belt_right_sender_->setPoint(downward_vel_);
@@ -250,7 +250,7 @@ void Dart2Manual::rotatePlace()
   ROS_INFO("Enter ROTATE_PLACE");
   belt_left_sender_->setPoint(0.0);
   belt_right_sender_->setPoint(0.0);
-  rotate_sender_ -> setPoint(rotate_place_position_[dart_fired_num_]);
+  rotate_sender_->setPoint(rotate_place_position_[dart_fired_num_]);
   confirm_place_ = true;
   last_rotate_time_ = ros::Time::now();
 }
@@ -268,7 +268,7 @@ void Dart2Manual::rotateBack()
   ROS_INFO("Enter ROTATE_BACK");
   belt_left_sender_->setPoint(0.0);
   belt_right_sender_->setPoint(0.0);
-  rotate_sender_ -> setPoint(rotate_back_position_[dart_fired_num_]);
+  rotate_sender_->setPoint(rotate_back_position_[dart_fired_num_]);
   confirm_back_ = true;
   last_rotate_time_ = ros::Time::now();
 }
@@ -293,7 +293,7 @@ void Dart2Manual::engage()
 void Dart2Manual::pullUp()
 {
   ROS_INFO("Enter PULLUP");
-  rotate_sender_ -> setPoint(rotate_place_position_[0]);
+  rotate_sender_->setPoint(rotate_place_position_[0]);
   belt_right_sender_->setPoint(upward_vel_);
   belt_left_sender_->setPoint(upward_vel_);
 }
@@ -369,14 +369,14 @@ void Dart2Manual::adjust()
   {
     long_camera_x_set_point_ +=
         (dart_list_[dart_fired_num_].base_offset_ - dart_list_[dart_fired_num_ - 1].base_offset_);
-    long_camera_y_set_point_ +=
-        (dart_list_[dart_fired_num_].base_range_ - dart_list_[dart_fired_num_ - 1].base_range_);
+    long_camera_y_set_point_ += (dart_list_[dart_fired_num_].base_range_ - dart_list_[dart_fired_num_ - 1].base_range_);
     had_adjust_ = true;
   }
   if (yaw_velocity_ < 0.001 && ros::Time::now() - last_adjust_time_ > ros::Duration(0.1) && range_velocity_ < 0.001)
   {
-    ROS_INFO("The %d dart had adjusted.Now x error:%lf, yaw position: %lf ,range position: %lf", dart_fired_num_, long_camera_x_,
-             joint_state_.position[yaw_sender_->getIndex()], joint_state_.position[range_sender_->getIndex()]);
+    ROS_INFO("The %d dart had adjusted.Now x error:%lf, yaw position: %lf ,range position: %lf", dart_fired_num_,
+             long_camera_x_, joint_state_.position[yaw_sender_->getIndex()],
+             joint_state_.position[range_sender_->getIndex()]);
     long_camera_x_before_push_ = long_camera_x_;
     had_adjust_ = false;
     auto_aim_state_ = ADJUSTED;
@@ -424,17 +424,19 @@ void Dart2Manual::run()
   if (need_back_ && ros::Time::now() - last_init_time_ > ros::Duration(2.0))
   {
     need_back_ = false;
-    rotate_sender_ -> setPoint(rotate_back_position_[1]);
+    rotate_sender_->setPoint(rotate_back_position_[1]);
   }
 }
 
 void Dart2Manual::updateRc(const rm_msgs::DbusData::ConstPtr& dbus_data)
 {
   ManualBase::updateRc(dbus_data);
-  if (std::abs(dbus_data->ch_r_x) > std::abs(dbus_data->ch_r_y)){
+  if (std::abs(dbus_data->ch_r_x) > std::abs(dbus_data->ch_r_y))
+  {
     move(yaw_sender_, dbus_data->ch_r_x);
   }
-  if (std::abs(dbus_data->ch_r_y) > std::abs(dbus_data->ch_r_x)){
+  if (std::abs(dbus_data->ch_r_y) > std::abs(dbus_data->ch_r_x))
+  {
     move(range_sender_, dbus_data->ch_r_y);
   }
   operateGripper(dbus_data);
@@ -481,37 +483,39 @@ void Dart2Manual::changeGripperState(rm_common::JointPointCommandSender* gripper
   if (is_release)
   {
     if (clamp_position_.find(gripper) != clamp_position_.end())
-      gripper -> setPoint(clamp_position_.at(gripper));
+      gripper->setPoint(clamp_position_.at(gripper));
     is_release = false;
   }
   else
   {
-    gripper -> setPoint(release_position_);
+    gripper->setPoint(release_position_);
     is_release = true;
   }
 }
 
 void Dart2Manual::changeAllGripperState()
 {
-  changeGripperState(clamp_left_sender_,left_clamp_is_release_);
-  changeGripperState(clamp_mid_sender_,mid_clamp_is_release_);
-  changeGripperState(clamp_right_sender_,right_clamp_is_release_);
+  changeGripperState(clamp_left_sender_, left_clamp_is_release_);
+  changeGripperState(clamp_mid_sender_, mid_clamp_is_release_);
+  changeGripperState(clamp_right_sender_, right_clamp_is_release_);
 }
 
 void Dart2Manual::readyLaunchDart(int dart_fired_num)
 {
-  if (launch_mode_ == INIT && shooter_calibration_->isCalibrated()  &&
+  if (launch_mode_ == INIT && shooter_calibration_->isCalibrated() &&
       ros::Time::now() - last_init_time_ > ros::Duration(0.2) && last_init_time_ > last_push_time_)
     launch_mode_ = PULLDOWN;
-  if (launch_mode_ == PULLDOWN && belt_left_position_ >= belt_left_place_ && belt_right_position_ >= belt_right_place_ &&
-      dart_fired_num != 0)
+  if (launch_mode_ == PULLDOWN && belt_left_position_ >= belt_left_place_ &&
+      belt_right_position_ >= belt_right_place_ && dart_fired_num != 0)
     launch_mode_ = ROTATE_PLACE;
   if (launch_mode_ == ROTATE_PLACE && dart_fired_num != 0 && rotate_velocity_ < 0.01 && confirm_place_ &&
       ros::Time::now() - last_rotate_time_ > ros::Duration(1.0))
     launch_mode_ = LOADING;
-  // if (((launch_mode_ == LOADING && ros::Time::now() - last_loading_time_ > ros::Duration(0.6) && last_loading_time_ > last_rotate_time_) || (launch_mode_ == PULLDOWN && belt_left_position_ >= belt_left_place_))  && check_place_ )
+  // if (((launch_mode_ == LOADING && ros::Time::now() - last_loading_time_ > ros::Duration(0.6) && last_loading_time_ >
+  // last_rotate_time_) || (launch_mode_ == PULLDOWN && belt_left_position_ >= belt_left_place_))  && check_place_ )
   //   launch_mode_ = PULLUP;
-  if (launch_mode_ == LOADING  && dart_fired_num != 0 && !confirm_place_ && ros::Time::now() - last_loading_time_ > ros::Duration(0.5))
+  if (launch_mode_ == LOADING && dart_fired_num != 0 && !confirm_place_ &&
+      ros::Time::now() - last_loading_time_ > ros::Duration(0.5))
     launch_mode_ = LOADED;
   if ((launch_mode_ == LOADED || launch_mode_ == PULLDOWN) && belt_left_position_ >= belt_left_max_ &&
       belt_right_position_ >= belt_right_max_ && check_place_)
@@ -558,7 +562,7 @@ void Dart2Manual::leftSwitchMidOn()
   {
     autoAim();
   }
-  //autoAim();
+  // autoAim();
 }
 
 void Dart2Manual::leftSwitchUpOn()
@@ -627,11 +631,11 @@ void Dart2Manual::updatePc(const rm_msgs::DbusData::ConstPtr& dbus_data)
         // yaw_sender_->setPoint(yaw_outpost_ + dart_list_[dart_fired_num_].outpost_offset_);
         // b_sender_->setPoint(b_outpost_);
         yaw_sender_->setPoint(yaw_base_ + long_camera_x_set_point_ + short_camera_x_set_point_);
-//        range_sender_->setPoint(range_base_ + long_camera_y_set_point_);
+        //        range_sender_->setPoint(range_base_ + long_camera_y_set_point_);
         break;
       case BASE:
         yaw_sender_->setPoint(yaw_base_ + long_camera_x_set_point_ + short_camera_x_set_point_);
-//        range_sender_->setPoint(range_base_ + long_camera_y_set_point_);
+        //        range_sender_->setPoint(range_base_ + long_camera_y_set_point_);
         break;
     }
     // if (dart_launch_opening_status_ != 1 && game_progress_ != rm_msgs::GameStatus::IN_BATTLE)
@@ -643,14 +647,15 @@ void Dart2Manual::updatePc(const rm_msgs::DbusData::ConstPtr& dbus_data)
       {
         allow_push_ = true;
         has_fired_num_ = 0;
-        ROS_INFO("Door open.allow push:%d,allow_dart_door_open_times: %d ",allow_push_, allow_dart_door_open_times_);
+        ROS_INFO("Door open.allow push:%d,allow_dart_door_open_times: %d ", allow_push_, allow_dart_door_open_times_);
       }
       if (last_dart_door_status_ - dart_launch_opening_status_ ==
           rm_msgs::DartClientCmd::OPENED - rm_msgs::DartClientCmd::OPENING_OR_CLOSING)
       {
         allow_push_ = false;
         allow_dart_door_open_times_--;
-        ROS_INFO("door close.now allow dart_door open times: %d, allow push: %d", allow_dart_door_open_times_, allow_push_);
+        ROS_INFO("door close.now allow dart_door open times: %d, allow push: %d", allow_dart_door_open_times_,
+                 allow_push_);
       }
       if (allow_dart_door_open_times_ > 0)
       {
@@ -665,27 +670,29 @@ void Dart2Manual::updatePc(const rm_msgs::DbusData::ConstPtr& dbus_data)
             case MOVING:
               break;
             case STOP:
-                if (launch_mode_ == READY && ros::Time::now() - last_ready_time_ > ros::Duration(0.3) &&
-                    last_ready_time_ > last_push_time_ && auto_aim_state_ == ADJUSTED && dart_launch_opening_status_ == rm_msgs::DartClientCmd::OPENED)
-                {
-                  launch_mode_ = PUSH;
-                  has_fired_num_++;
-                  ROS_INFO("has fired_num_=%d", has_fired_num_);
-                }
-                if (launch_mode_ == PUSH && last_push_time_ > last_ready_time_ &&
-                    ros::Time::now() - last_push_time_ > ros::Duration(0.3))
-                {
-                  ROS_INFO("now time: %f; last push time: %f", ros::Time::now().toSec(), last_push_time_.toSec());
-                  launch_mode_ = INIT;
-                }
+              if (launch_mode_ == READY && ros::Time::now() - last_ready_time_ > ros::Duration(0.3) &&
+                  last_ready_time_ > last_push_time_ && auto_aim_state_ == ADJUSTED &&
+                  dart_launch_opening_status_ == rm_msgs::DartClientCmd::OPENED)
+              {
+                launch_mode_ = PUSH;
+                has_fired_num_++;
+                ROS_INFO("has fired_num_=%d", has_fired_num_);
+              }
+              if (launch_mode_ == PUSH && last_push_time_ > last_ready_time_ &&
+                  ros::Time::now() - last_push_time_ > ros::Duration(0.3))
+              {
+                ROS_INFO("now time: %f; last push time: %f", ros::Time::now().toSec(), last_push_time_.toSec());
+                launch_mode_ = INIT;
+              }
               break;
           }
         }
-        if (last_push_time_ > last_ready_time_ && ros::Time::now() - last_push_time_ > ros::Duration(0.3) && has_fired_num_ == 2)
+        if (last_push_time_ > last_ready_time_ && ros::Time::now() - last_push_time_ > ros::Duration(0.3) &&
+            has_fired_num_ == 2)
           launch_mode_ = INIT;
       }
       else
-        range_sender_ -> setPoint(0.01);
+        range_sender_->setPoint(0.01);
     }
     last_dart_door_status_ = dart_launch_opening_status_;
   }
@@ -746,10 +753,12 @@ void Dart2Manual::updateAllowDartDoorOpenTimes()
   }
 }
 
-void Dart2Manual::updateGripper(){
+void Dart2Manual::updateGripper()
+{
   if (last_gripper_state_ != gripper_state_)
   {
-    switch (gripper_state_) {
+    switch (gripper_state_)
+    {
       case LEFT:
         ROS_INFO("Left gripper change state.");
         changeGripperState(clamp_left_sender_, left_clamp_is_release_);
@@ -823,7 +832,7 @@ void Dart2Manual::wheelClockwise()
 
 void Dart2Manual::wheelAntiClockwise()
 {
-  clamp_calibration_ -> reset();
+  clamp_calibration_->reset();
 }
 
 void Dart2Manual::longCameraDataCallback(const rm_msgs::Dart::ConstPtr& data)
@@ -850,18 +859,18 @@ void Dart2Manual::setGripperAction(int dart_fired_num)
     case 0:
       break;
     case 1:
-      clamp_left_sender_ -> setPoint(release_position_);
+      clamp_left_sender_->setPoint(release_position_);
       left_clamp_is_release_ = true;
       break;
     case 2:
-      clamp_mid_sender_ -> setPoint(release_position_);
-      clamp_left_sender_ -> setPoint(clamp_finish_position_);
+      clamp_mid_sender_->setPoint(release_position_);
+      clamp_left_sender_->setPoint(clamp_finish_position_);
       mid_clamp_is_release_ = true;
       left_clamp_is_release_ = false;
       break;
     case 3:
-      clamp_right_sender_ -> setPoint(release_position_);
-      clamp_mid_sender_ -> setPoint(clamp_finish_position_);
+      clamp_right_sender_->setPoint(release_position_);
+      clamp_mid_sender_->setPoint(clamp_finish_position_);
       right_clamp_is_release_ = true;
       mid_clamp_is_release_ = false;
       break;
