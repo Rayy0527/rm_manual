@@ -33,5 +33,4 @@ protected:
   ros::Publisher aim_priority_pub_;
   rm_msgs::PriorityArray aim_priority_array_;
 };
-}
-
+}  // namespace rm_manual
