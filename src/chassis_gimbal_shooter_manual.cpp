@@ -29,7 +29,9 @@ ChassisGimbalShooterManual::ChassisGimbalShooterManual(ros::NodeHandle& nh, ros:
   }
 
   ros::NodeHandle detection_switch_nh(nh, "detection_switch");
+  ros::NodeHandle detection_switch_left_nh(nh, "detection_switch_left");
   switch_detection_srv_ = new rm_common::SwitchDetectionCaller(detection_switch_nh);
+  switch_detection_left_srv_ = new rm_common::SwitchDetectionCaller(detection_switch_left_nh);
   ros::NodeHandle armor_target_switch_nh(nh, "armor_target_switch");
   switch_armor_target_srv_ = new rm_common::SwitchDetectionCaller(armor_target_switch_nh);
   XmlRpc::XmlRpcValue rpc_value;
